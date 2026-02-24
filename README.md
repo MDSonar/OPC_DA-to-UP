@@ -295,19 +295,19 @@ reg add "HKLM\SOFTWARE\Microsoft\Ole\AppCompat\ActivationSecurityCheckExemptionL
 
 ## 11. Client VM Critical Setup
 
-### ✅ THE MOST IMPORTANT FIX
-
-**Install OPC Core Components (x86) on Client VM**
-
-Without this installation, Matrikon Explorer **CANNOT** connect remotely.
-
-### Installation Steps
-
-1. Download **OPC Core Components 3.00.108 (x86)** from OPC Foundation
-2. Install on the Client VM
-3. **Reboot the client VM**
-
-This is the critical component that enables remote OPC DA browsing.
+Run this on where Fusion installed
+### Inbound rule for 135
+```powershell
+netsh advfirewall firewall add rule name="OPC RPC 135 In" dir=in action=allow protocol=TCP localport=135
+```
+### Inbound - Open dynamic RPC Range 
+```powershell
+netsh advfirewall firewall add rule name="OPC RPC Dynamic In" dir=in action=allow protocol=TCP localport=49152-65535
+```
+### Outbound - Open dynamic RPC Range 
+```powershell
+netsh advfirewall firewall add rule name="OPC RPC Dynamic Out" dir=out action=allow protocol=TCP localport=49152-65535
+```
 
 ---
 
@@ -337,7 +337,7 @@ Enter the password when prompted.
 ---
 
 ## 13. Connecting UA server of Fusion to LE on gateway/VM on same network 
-Run this on where Fusion installed
+
 ### Inbound rule for 4840
 ```powershell
 netsh advfirewall firewall add rule name="Litmus OPC Fusion UA 4840" dir=in action=allow protocol=TCP localport=4840
@@ -346,6 +346,17 @@ netsh advfirewall firewall add rule name="Litmus OPC Fusion UA 4840" dir=in acti
 ```poweshell
 netsh advfirewall firewall add rule name="Litmus OPC Fusion UA 4840 OUT" dir=out action=allow protocol=TCP localport=4840
 ```
+---
+
+### Verify From Server 
+Run in Powershell Admin
+```powershell
+Test-NetConnection <client-ip> -Port 135
+```
+```powershell
+Test-NetConnection <client-ip> -Port 49664
+```
+here port number for dynamic range might vary 
 ---
 ## Troubleshooting
 
